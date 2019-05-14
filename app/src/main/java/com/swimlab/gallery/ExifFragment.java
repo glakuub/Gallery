@@ -1,14 +1,8 @@
 package com.swimlab.gallery;
 
-import android.database.Cursor;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,13 +19,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 
+public class ExifFragment extends Fragment {
 
-public class DetailsViewFragment extends Fragment {
 
-    private Uri pictureUri;
     ExifInterface exifInterface;
     InputStream is;
     TextView textView;
+    Uri pictureUri;
 
     static HashMap<String,String> stringTags;
     static HashMap<String,String> doubleTags;
@@ -39,12 +33,16 @@ public class DetailsViewFragment extends Fragment {
 
     static {
         stringTags = new LinkedHashMap<>();
-        stringTags.put(ExifInterface.TAG_ARTIST,"Artysta:");
-        stringTags.put(ExifInterface.TAG_DATETIME,"Date:");
-        stringTags.put(ExifInterface.TAG_CFA_PATTERN,"1:");
-        stringTags.put(ExifInterface.TAG_COPYRIGHT,"3:");
-        stringTags.put(ExifInterface.TAG_DEVICE_SETTING_DESCRIPTION,"4:");
-        stringTags.put(ExifInterface.TAG_EXIF_VERSION,"Exif version:");
+        stringTags.put(ExifInterface.TAG_ARTIST,"Artysta: ");
+        stringTags.put(ExifInterface.TAG_DATETIME,"Date: ");
+        stringTags.put(ExifInterface.TAG_CFA_PATTERN,"CFA pattern: ");
+        stringTags.put(ExifInterface.TAG_COPYRIGHT,"Copyright: ");
+        stringTags.put(ExifInterface.TAG_DEVICE_SETTING_DESCRIPTION,"Device setting description: ");
+        stringTags.put(ExifInterface.TAG_EXIF_VERSION,"Exif version: ");
+        stringTags.put(ExifInterface.TAG_GPS_ALTITUDE,"Altitude: ");
+        stringTags.put(ExifInterface.TAG_GPS_LATITUDE,"Latitude: ");
+        stringTags.put(ExifInterface.TAG_GPS_LONGITUDE,"Longitude: ");
+        //stringTags.put(ExifInterface.TAG_GPS_DATESTAMP,"Date: ");
 
         intTags = new LinkedHashMap<>();
         intTags.put(ExifInterface.TAG_BITS_PER_SAMPLE,"Bits: ");
@@ -64,33 +62,38 @@ public class DetailsViewFragment extends Fragment {
 
     }
 
+
+
+
+
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        assert getArguments() != null;
-        pictureUri = Uri.parse(getArguments().getString("uri"));
-        createExifInterface();
-        setRetainInstance(true);
+        String uriString = (String) getArguments().get("uri");
+        pictureUri = Uri.parse(uriString);
 
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
-    {
-        View detailsView = inflater.inflate(R.layout.details_view_fragment,container,false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View exifView = inflater.inflate(R.layout.fragment_exif, container, false);
+        textView = exifView.findViewById(R.id.exif_textview);
 
-        textView = detailsView.findViewById(R.id.details_text);
-        appendDetails();
-        appendStringAttributes();
-        appendIntAttributes();
-        appendDoubleAttributes();
-
-
-        return detailsView;
+        return exifView;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        createExifInterface();
+        appendDoubleAttributes();
+        appendIntAttributes();
+        appendStringAttributes();
+
+    }
+
     private void createExifInterface()
     {
 
@@ -127,13 +130,28 @@ public class DetailsViewFragment extends Fragment {
         {
             Map.Entry tagPair= (Map.Entry)iterator.next();
             String attributeVal;
-            attributeVal = exifInterface.getAttribute((String)tagPair.getKey());
+            String attribute = (String)tagPair.getKey();
+            attributeVal = exifInterface.getAttribute(attribute);
 
             if(attributeVal!=null) {
+
+
                 builder.append(tagPair.getValue());
                 builder.append(" ");
-                builder.append(attributeVal);
-                builder.append("\n");
+                if(attribute.equals(ExifInterface.TAG_GPS_LONGITUDE)
+                        ||attribute.equals(ExifInterface.TAG_GPS_LATITUDE)
+                        ||attribute.equals(ExifInterface.TAG_GPS_ALTITUDE))
+                {
+                    builder.append(parseGPS(attributeVal));
+                    if(attribute.equals(ExifInterface.TAG_GPS_ALTITUDE))
+                        builder.append(" m");
+                    builder.append("\n");
+                }
+                else {
+
+                    builder.append(attributeVal);
+                    builder.append("\n");
+                }
             }
         }
         textView.append(builder.toString());
@@ -180,27 +198,20 @@ public class DetailsViewFragment extends Fragment {
         }
         textView.append(builder.toString());
     }
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void appendDetails()
+    private String parseGPS(String orgiginalCoordinates)
     {
-        StringBuilder builder = new StringBuilder();
-        Cursor cursor = getActivity().getContentResolver().query(pictureUri,null,null,null,null);
-        assert cursor != null;
-        int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-        cursor.moveToFirst();
-        cursor.close();
-        builder.append("Name: ");
-        builder.append(cursor.getString(nameIndex));
-        builder.append("\n");
-        builder.append("Size: ");
-        builder.append(cursor.getString(sizeIndex));
-        builder.append("\n");
-        builder.append("Type: ");
-        builder.append(getActivity().getContentResolver().getType(pictureUri));
-        builder.append("\n");
+        StringBuilder result = new StringBuilder();
+        String [] pairs = orgiginalCoordinates.split(",");
 
-        textView.append(builder.toString());
-
+        for(String s : pairs)
+        {
+            String [] pair = s.split("/");
+            double value = Double.valueOf(pair[0])/Double.valueOf(pair[1]);
+            result.append(value);
+            result.append(" ");
+        }
+        result.setCharAt(result.length()-1,' ');
+        return result.toString();
     }
+
 }

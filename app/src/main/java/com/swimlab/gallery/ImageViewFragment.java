@@ -12,10 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -62,7 +59,7 @@ public class ImageViewFragment extends Fragment {
     private void seePhotoDetails(Uri pictureUri)
     {
         AppCompatActivity activity = (AppCompatActivity)getActivity();
-        DetailsViewFragment fragment = new DetailsViewFragment();
+        PropertiesViewFragment fragment = new PropertiesViewFragment();
 
         Bundle bundle = new Bundle();
         bundle.putString("uri",pictureUri.toString());
@@ -71,7 +68,7 @@ public class ImageViewFragment extends Fragment {
         activity.getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.framgment_container,fragment,"details")
-                .addToBackStack("details")
+                .addToBackStack("preview")
                 .commit();
 
     }
