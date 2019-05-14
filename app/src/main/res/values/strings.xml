@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Gallery</string>
+    <string name="send_to">Wyślij do:</string>
+    <string name="set_as">Ustaw jako</string>
+    <string name="switchButton">Switch layout</string>
+    <string name="directoryButton">Change Directory</string>
+    <string name="switchLayoutTitle">Switch layout</string>
+    <string name="changeDirectoryTitle">Change directory</string>
+    <string name="sendPhotoTitle">Send</string>
+    <string name="setWallpaperTitle">Set as wallpaper</string>
+    <string name="seeDetails">See details</string>
+    <string name="details_string">Details/EXIF</string>
+</resources>

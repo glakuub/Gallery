@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sendPhoto"
+        android:title="@string/sendPhotoTitle">
+
+    </item>
+    <item android:id="@+id/setWallpaper"
+        android:title="@string/setWallpaperTitle"
+        >
+
+    </item>
+    <item android:id="@+id/seeDetails"
+        android:title="@string/seeDetails"
+        >
+
+    </item>
+</menu>
