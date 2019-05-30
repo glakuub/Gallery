@@ -3,9 +3,11 @@ package com.swimlab.gallery;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,7 +15,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+
+import com.theartofdev.edmodo.cropper.CropImage;
+
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 
 public class ImageViewFragment extends Fragment {
@@ -43,19 +50,24 @@ public class ImageViewFragment extends Fragment {
             case R.id.setWallpaper:
                 setAsWallpaper(pictureUri);
                 return true;
-
             case R.id.sendPhoto:
                 sendPhoto(pictureUri);
                 return true;
             case R.id.seeDetails:
                 seePhotoDetails(pictureUri);
                 return true;
+            case R.id.cropImage:
+                cropImage(pictureUri);
+                return true;
             default:
                 return super.onOptionsItemSelected(menuItem);
         }
 
     }
-
+    private void cropImage(Uri pictureUri)
+    {
+        CropImage.activity(pictureUri).start(getContext(),this);
+    }
     private void seePhotoDetails(Uri pictureUri)
     {
         AppCompatActivity activity = (AppCompatActivity)getActivity();
@@ -101,7 +113,7 @@ public class ImageViewFragment extends Fragment {
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(currentPicture);
 
-        android.support.v7.widget.Toolbar toolbar =  fragmentView.findViewById(R.id.image_view_toolbar);
+        androidx.appcompat.widget.Toolbar toolbar =  fragmentView.findViewById(R.id.image_view_toolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
         return fragmentView;
@@ -113,5 +125,20 @@ public class ImageViewFragment extends Fragment {
     public void updateCurrentPicture(int index)
     {
         currentPicture=index;
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+                Log.d("uri",resultUri.toString());
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+
     }
 }

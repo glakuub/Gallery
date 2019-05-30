@@ -1,23 +1,17 @@
 package com.swimlab.gallery;
 
-import android.Manifest;
-import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.provider.DocumentFile;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.fragment.app.Fragment;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,7 +19,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +87,7 @@ public class RecyclerViewFragment extends Fragment {
 
         setOnElementClickListener((int i)->sendToDisplay(i));
 
-        android.support.v7.widget.Toolbar toolbar =  view.findViewById(R.id.galleryToolbar);
+        androidx.appcompat.widget.Toolbar toolbar =  view.findViewById(R.id.galleryToolbar);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
 
